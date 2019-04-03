@@ -14,9 +14,19 @@
     />
     <transition name="fade" mode="out-in">
       <AppLightboxWrapper
-        v-show="showLightbox"
+        v-show="showLightboxPlayingError"
+        @close="SET_SHOW_LIGHTBOX_PLAYING_ERROR(false)"
       >
         <AppPlayingError />
+      </AppLightboxWrapper>
+    </transition>
+    <transition name="fade" mode="out-in">
+      <AppLightboxWrapper
+        v-show="showLightboxMember"
+        :close-icon-theme="'light'"
+        @close="SET_SHOW_LIGHTBOX_MEMBER(false)"
+      >
+        <LightboxContentMember />
       </AppLightboxWrapper>
     </transition>
     <AppNativeNotification
@@ -32,7 +42,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapMutations } from 'vuex'
 
 import AppHeader from '~/components/AppHeader.vue'
 // import AppBreadcrumb from '~/components/AppBreadcrumb.vue'
@@ -40,6 +50,7 @@ import AppFooter from '~/components/AppFooter.vue'
 import AppPlayer from '~/components/AppPlayer.vue'
 import AppLightboxWrapper from '~/components/AppLightboxWrapper.vue'
 import AppPlayingError from '~/components/AppPlayingError.vue'
+import LightboxContentMember from '~/components/Member/Lightbox.vue'
 import AppNativeNotification from '~/components/AppNativeNotification.vue'
 
 export default {
@@ -50,6 +61,7 @@ export default {
     AppPlayer,
     AppLightboxWrapper,
     AppPlayingError,
+    LightboxContentMember,
     AppNativeNotification
   },
   data() {
@@ -62,7 +74,9 @@ export default {
   computed: {
     ...mapState({
       showPlayer: state => state.appPlayer.showAppPlayer,
-      showLightbox: state => state.lightboxPlayingError.showLightbox
+      showLightboxPlayingError: state =>
+        state.lightboxPlayingError.showLightbox,
+      showLightboxMember: state => state.lightboxMember.showLightbox
     }),
     // hideBreadcrumb() {
     //   const paths = ['/', '/tos', '/privacy_rule']
@@ -125,7 +139,12 @@ export default {
           this.scrolledToBottom = true
         }
       }
-    }
+    },
+
+    ...mapMutations({
+      SET_SHOW_LIGHTBOX_MEMBER: 'lightboxMember/SET_SHOW_LIGHTBOX',
+      SET_SHOW_LIGHTBOX_PLAYING_ERROR: 'lightboxPlayingError/SET_SHOW_LIGHTBOX'
+    })
   }
 }
 </script>

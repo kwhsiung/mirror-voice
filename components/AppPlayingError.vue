@@ -67,6 +67,7 @@ export default {
   flex-direction column
   align-items center
   margin 14px 0
+  padding 14px
   &__bottom
     margin 30px 0 0 0
 

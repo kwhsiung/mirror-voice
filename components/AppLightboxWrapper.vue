@@ -1,7 +1,7 @@
 <template>
   <div
     class="lightbox-wrapper"
-    @click="SET_SHOW_LIGHTBOX(false)"
+    @click="$emit('close')"
   >
     <div
       class="lightbox-wrapper__content content"
@@ -9,9 +9,9 @@
     >
       <img
         class="content__close"
-        src="~/assets/img/close_gray.png"
+        :src="closeIconPath"
         alt=""
-        @click="SET_SHOW_LIGHTBOX(false)"
+        @click="$emit('close')"
       >
       <slot />
     </div>
@@ -19,13 +19,21 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
-
 export default {
-  methods: {
-    ...mapMutations({
-      SET_SHOW_LIGHTBOX: 'lightboxPlayingError/SET_SHOW_LIGHTBOX'
-    })
+  props: {
+    closeIconTheme: {
+      type: String,
+      default: 'dark',
+      validator(value) {
+        return ['dark', 'light'].includes(value)
+      }
+    }
+  },
+  computed: {
+    closeIconPath() {
+      const fileName = this.closeIconTheme === 'dark' ? 'close_gray' : 'close'
+      return require(`~/assets/img/${fileName}.png`)
+    }
   }
 }
 </script>
@@ -51,7 +59,7 @@ export default {
   position relative
   min-width 450px
   min-height 100px
-  padding 14px
+  // padding 14px
   &__close
     position absolute
     top 14px
