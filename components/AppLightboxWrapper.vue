@@ -52,6 +52,7 @@ export default {
   align-items center
   &__content
     border-radius 4px
+    overflow hidden // perform border-radius cliping
     box-shadow 1.4px 1.4px 3.8px 0.2px rgba(0, 0, 0, 0.2)
     background-color #ffffff
 

@@ -50,7 +50,7 @@ import AppFooter from '~/components/AppFooter.vue'
 import AppPlayer from '~/components/AppPlayer.vue'
 import AppLightboxWrapper from '~/components/AppLightboxWrapper.vue'
 import AppPlayingError from '~/components/AppPlayingError.vue'
-import LightboxContentMember from '~/components/Member/Lightbox.vue'
+import LightboxContentMember from '~/components/Member/Lightbox/Lightbox.vue'
 import AppNativeNotification from '~/components/AppNativeNotification.vue'
 
 export default {

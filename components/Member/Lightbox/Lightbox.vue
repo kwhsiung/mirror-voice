@@ -4,16 +4,39 @@
       class="lightbox__header header"
     >
       <img
-        v-lazy="require('~/assets/img/mirrorvoice_logo_login.png')"
+        src="~/assets/img/mirrorvoice_logo_login.png"
         class="header__logo"
         alt=""
       >
       <p class="header__title">
-        註冊鏡語音帳號
+        {{ title[currentStatus] }}
       </p>
     </header>
+    <Login
+      v-show="currentStatus === 'login'"
+      @register="currentStatus = 'register'"
+    />
   </div>
 </template>
+
+<script>
+import Login from './Login.vue'
+
+export default {
+  components: {
+    Login
+  },
+  data() {
+    return {
+      currentStatus: 'login',
+      title: {
+        login: '登入鏡語音',
+        register: '註冊鏡語音帳號'
+      }
+    }
+  }
+}
+</script>
 
 <style lang="stylus" scoped>
 .header
