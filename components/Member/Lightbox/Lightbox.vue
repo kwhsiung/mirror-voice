@@ -16,15 +16,21 @@
       v-show="currentStatus === 'login'"
       @register="currentStatus = 'register'"
     />
+    <Register
+      v-show="currentStatus === 'register'"
+      @login="currentStatus = 'login'"
+    />
   </div>
 </template>
 
 <script>
 import Login from './Login.vue'
+import Register from './Register.vue'
 
 export default {
   components: {
-    Login
+    Login,
+    Register
   },
   data() {
     return {
