@@ -14,16 +14,18 @@
     </header>
     <Login
       v-show="currentStatus === 'login'"
-      @register="currentStatus = 'register'"
+      @register="toggleStatusRegister"
     />
     <Register
       v-show="currentStatus === 'register'"
-      @login="currentStatus = 'login'"
+      @login="toggleStatusLogin"
     />
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
 import Login from './Login.vue'
 import Register from './Register.vue'
 
@@ -39,6 +41,28 @@ export default {
         login: '登入鏡語音',
         register: '註冊鏡語音帳號'
       }
+    }
+  },
+  computed: {
+    ...mapState({
+      showLightbox: state => state.lightboxMember.showLightbox
+    })
+  },
+  watch: {
+    showLightbox() {
+      if (!this.showLightbox) {
+        setTimeout(() => {
+          this.toggleStatusLogin()
+        }, 250)
+      }
+    }
+  },
+  methods: {
+    toggleStatusLogin() {
+      this.currentStatus = 'login'
+    },
+    toggleStatusRegister() {
+      this.currentStatus = 'register'
     }
   }
 }

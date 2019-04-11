@@ -16,6 +16,8 @@ const { readMiddle, writeMiddle } = require('./middle/redis')
 
 // const debug = require('debug')('express:api/index')
 
+router.use('/member', require('./member'))
+
 const _axios = axios.create({
   baseURL: apiURL,
   timeout: API_TIMEOUT

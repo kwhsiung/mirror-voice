@@ -50,11 +50,20 @@
         >
       </UserInput>
     </div>
-    <div class="register__recaptcha-wrapper recaptcha-wrapper" />
+    <div class="register__recaptcha-wrapper recaptcha-wrapper">
+      <VueRecaptcha
+        class="recaptcha-wrapper__recaptcha"
+        :sitekey="recaptcha.siteKey"
+        @verify="onRecaptchaVerify"
+      />
+    </div>
     <div class="register__reminder reminder">
       <p>
         按下註冊鈕的同時，表示您已詳閱我們的
-        <nuxt-link to="/privacy_rule">
+        <nuxt-link
+          to="/privacy_rule"
+          @click.native="SET_SHOW_LIGHTBOX(false)"
+        >
           資料使用政策與使用條款
         </nuxt-link>
         ，同意使用 mm 所提供的服務並訂閱電子報。
@@ -62,6 +71,7 @@
     </div>
     <button
       class="register__register-button"
+      @click="register"
     >
       註冊
     </button>
@@ -80,18 +90,66 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
+
+import VueRecaptcha from 'vue-recaptcha'
 import UserInput from './UserInput.vue'
 
 export default {
   components: {
-    UserInput
+    UserInput,
+    VueRecaptcha
   },
   data() {
     return {
       nickname: '',
       email: '',
       password: '',
-      passwordConfirm: ''
+      passwordConfirm: '',
+      recaptcha: {
+        siteKey: '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
+        isVerify: false
+      }
+    }
+  },
+  computed: {
+    isNicknameValid() {
+      return this.nickname !== ''
+    },
+    isEmailValid() {
+      return this.$isEmail(this.email)
+    },
+    isPasswordValid() {
+      return this.password !== '' && this.password === this.passwordConfirm
+    },
+    canRegister() {
+      return (
+        this.isNicknameValid &&
+        this.isEmailValid &&
+        this.isPasswordValid &&
+        this.recaptcha.isVerify
+      )
+    }
+  },
+  methods: {
+    onRecaptchaVerify() {
+      this.recaptcha.isVerify = true
+    },
+
+    ...mapMutations({
+      SET_SHOW_LIGHTBOX: 'lightboxMember/SET_SHOW_LIGHTBOX'
+    }),
+
+    register() {
+      // if (this.canRegister) {
+      this.$sendRegister({
+        nickname: this.nickname,
+        email: this.email,
+        password: this.password
+      }).then(res => {
+        console.log(res)
+      })
+      // }
     }
   }
 }
@@ -132,7 +190,9 @@ export default {
 .recaptcha-wrapper
   width 270px
   height 67px
-  background-color white
+  &__recaptcha
+    transform scale(0.894) // 270 / 340
+    transform-origin 0 0
 
 .reminder
   width 270px

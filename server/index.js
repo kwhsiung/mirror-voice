@@ -52,6 +52,7 @@ async function start() {
 }
 
 app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: false }))
 app.use(compression({ threshold: 0 }))
 
 start()

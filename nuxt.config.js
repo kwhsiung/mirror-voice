@@ -5,14 +5,14 @@ const { SERVER_PROTOCOL, SERVER_HOST, SERVER_PORT } = require('./server/config')
 const isProd = process.env.NODE_ENV === 'production'
 const baseURL = isProd
   ? `${SERVER_PROTOCOL}://${SERVER_HOST}:${SERVER_PORT}`
-  : `http://localhost:8080`
+  : `http://localhost:8081`
 
 module.exports = {
   mode: 'universal',
 
   server: {
     host: isProd ? '0.0.0.0' : '127.0.0.1',
-    port: isProd ? '80' : 8080
+    port: isProd ? '80' : 8081
   },
 
   // TODO: we could refactor this
@@ -67,7 +67,14 @@ module.exports = {
         content: '/ogImg/default.jpg'
       }
     ],
-    link: [{ rel: 'icon', type: 'image/png', href: '/favicon05.png' }]
+    link: [{ rel: 'icon', type: 'image/png', href: '/favicon05.png' }],
+    script: [
+      {
+        src:
+          'https://www.google.com/recaptcha/api.js?onload=vueRecaptchaApiLoaded&render=explicit',
+        defer: true
+      }
+    ]
   },
 
   router: {

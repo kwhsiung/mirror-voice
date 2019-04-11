@@ -24,4 +24,11 @@ export default ({ $axios }, inject) => {
     const url = `/api/posts?${query}`
     return _axios.get(url).then(res => res)
   })
+
+  inject('sendRegister', ({ nickname = '', email = '', password = '' }) => {
+    const url = '/api/member/register'
+    return _axios
+      .post(url, { data: { nickname, email, password } })
+      .then(res => res)
+  })
 }
