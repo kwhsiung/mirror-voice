@@ -35,6 +35,15 @@ describe('BasePlayerRate', () => {
     expect(listItemsNotActive.length).toBe(ratesAvailable.length - 1)
   })
   test('emit "update:playbackRateCurrent" with different rate value while rate list item clicked', () => {
-    // const wrapper = shallowMount(BasePlayerRate)
+    const playbackRateChangedIndex = 1
+    const playbackRateChanged = ratesAvailable[playbackRateChangedIndex]
+    const wrapper = shallowMount(BasePlayerRate)
+
+    const listItem = wrapper.findAll('li').at(playbackRateChangedIndex)
+    listItem.trigger('click')
+
+    expect(wrapper.emitted('update:playbackRateCurrent')[0]).toEqual([
+      playbackRateChanged
+    ])
   })
 })

@@ -52,6 +52,9 @@ export default {
     formatRateDisplay(rate) {
       const rateString = rate.toString()
       return _.padEnd(rateString, 3, '.0')
+    },
+    pickRate(rate) {
+      this.$emit('update:playbackRateCurrent', rate)
     }
   }
 }
