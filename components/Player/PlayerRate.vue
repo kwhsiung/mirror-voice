@@ -1,18 +1,9 @@
 <template>
-  <div
-    v-click-outside="hidePicker"
-    class="rate"
-  >
-    <p
-      class="rate__indicator"
-      @click="togglePicker"
-    >
+  <div v-click-outside="hidePicker" class="rate">
+    <p class="rate__indicator" @click="togglePicker">
       X {{ formatRateDisplay(rate) }}
     </p>
-    <ol
-      v-show="showPicker"
-      class="rate__picker picker"
-    >
+    <ol v-show="showPicker" class="rate__picker picker">
       <li
         v-for="rateAvailable in ratesAvailable"
         :key="rateAvailable"
@@ -83,43 +74,58 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.rate
-  height 100%
-  display flex
-  justify-content center
-  align-items center
-  position relative
-  &__indicator
-    min-width 57px
-    font-size 18px
-    font-weight 600
-    color #e5e5e5
-    line-height 1
-    cursor pointer
-    user-select none
-  &__picker
-    position absolute
-    bottom calc(100% + 3px)
-    width 52px
-    background-color #313131
-    border-radius 2px
+.rate {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
 
-.picker
-  list-style none
-  margin 0
-  padding 20px 13px
-  &__list-item
-    color white
-    line-height 1.29
-    cursor pointer
-    &--highlight
-      color #d84939
-    & + &
-      margin 17px 0 0 0
+  &__indicator {
+    min-width: 57px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #e5e5e5;
+    line-height: 1;
+    cursor: pointer;
+    user-select: none;
+  }
 
-@media (max-width 768px)
-  .rate
-    &__indicator
-      min-width 50px
-      font-size 15px
+  &__picker {
+    position: absolute;
+    bottom: calc(100% + 3px);
+    width: 52px;
+    background-color: #313131;
+    border-radius: 2px;
+  }
+}
+
+.picker {
+  list-style: none;
+  margin: 0;
+  padding: 20px 13px;
+
+  &__list-item {
+    color: white;
+    line-height: 1.29;
+    cursor: pointer;
+
+    &--highlight {
+      color: #d84939;
+    }
+
+    & + & {
+      margin: 17px 0 0 0;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .rate {
+    &__indicator {
+      min-width: 50px;
+      font-size: 15px;
+    }
+  }
+}
 </style>
