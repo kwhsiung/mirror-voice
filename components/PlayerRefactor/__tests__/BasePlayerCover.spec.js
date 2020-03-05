@@ -31,6 +31,7 @@ describe('BasePlayerCover', () => {
 
     expect(img.attributes().src).toBe(imgSrc)
   })
+
   test('hide img if imgSrc is missing', () => {
     const wrapper = shallowMount(BasePlayerCover, {
       stubs: {
@@ -41,6 +42,7 @@ describe('BasePlayerCover', () => {
 
     expect(img.element.style.display).toBe('none')
   })
+
   test('renders component correctly if we provide efficient props', () => {
     const wrapper = shallowMount(BasePlayerCover, {
       propsData: {
@@ -51,6 +53,7 @@ describe('BasePlayerCover', () => {
         NuxtLink: RouterLinkStub
       }
     })
+
     expect(wrapper.element).toMatchSnapshot()
   })
 })
