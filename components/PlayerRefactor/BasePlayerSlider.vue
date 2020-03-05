@@ -1,13 +1,14 @@
 <template>
   <VueSlider
     v-model="value"
+    class="slider"
     :rail-style="{ background }"
     v-bind="options"
   />
 </template>
 
 <script>
-import VueSlider from 'vue-slider-component'
+import VueSlider from 'vue-slider-component/dist-css/vue-slider-component.umd.min.js'
 
 export default {
   components: {
@@ -71,5 +72,9 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-
+.slider
+  cursor pointer
+  & >>> .vue-slider-dot
+    background-color #eeeeee
+    border-radius 100%
 </style>

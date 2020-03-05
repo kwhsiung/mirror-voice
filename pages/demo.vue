@@ -1,13 +1,15 @@
 <template>
   <div>
     <Demo
-      style="margin-top: 500px"
+      :direction="'vertical'"
+      :value-buffered="0.5"
+      :value-current="0.3"
     />
   </div>
 </template>
 
 <script>
-import Demo from '~/components/PlayerRefactor/BasePlayerRate.vue'
+import Demo from '~/components/PlayerRefactor/BasePlayerSlider.vue'
 
 export default {
   components: {
