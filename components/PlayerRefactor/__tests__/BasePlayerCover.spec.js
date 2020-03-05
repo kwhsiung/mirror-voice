@@ -42,7 +42,9 @@ describe('BasePlayerCover', () => {
 
     expect(img.element.style.display).toBe('none')
   })
+})
 
+describe('snapshot tests', () => {
   test('renders component correctly if we provide efficient props', () => {
     const wrapper = shallowMount(BasePlayerCover, {
       propsData: {

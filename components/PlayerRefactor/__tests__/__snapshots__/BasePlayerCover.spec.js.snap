@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`BasePlayerCover renders component correctly if we provide efficient props 1`] = `
+exports[`snapshot tests renders component correctly if we provide efficient props 1`] = `
 <a
   class="cover"
 >
