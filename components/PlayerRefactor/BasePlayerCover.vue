@@ -1,8 +1,11 @@
 <template>
   <nuxt-link
+    class="cover"
     :to="to"
   >
     <img
+      v-show="showImg"
+      class="cover__img"
       :src="imgSrc"
       alt=""
     >
@@ -20,9 +23,23 @@ export default {
       type: String,
       default: ''
     }
+  },
+  computed: {
+    showImg() {
+      return this.imgSrc && this.imgSrc !== ''
+    }
   }
 }
 </script>
 
-<style land="stylus" scoped>
+<style lang="stylus" scoped>
+.cover
+  display inline-block
+  d = 34px
+  width d
+  height d
+  &__img
+    width 100%
+    height 100%
+    object-fit cover
 </style>
