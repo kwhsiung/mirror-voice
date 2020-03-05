@@ -1,19 +1,23 @@
 <template>
   <div>
-    <Demo
-      :direction="'vertical'"
-      :value-buffered="0.5"
-      :value-current="0.3"
+    <BasePlayerVolume
+      style="margin-top: 500px; background-color: black"
+      :volume-current.sync="vol"
     />
   </div>
 </template>
 
 <script>
-import Demo from '~/components/PlayerRefactor/BasePlayerSlider.vue'
+import BasePlayerVolume from '~/components/PlayerRefactor/BasePlayerVolume.vue'
 
 export default {
   components: {
-    Demo
+    BasePlayerVolume
+  },
+  data() {
+    return {
+      vol: 0.5
+    }
   }
 }
 </script>
