@@ -9,6 +9,7 @@ describe('BasePlayerNavs', () => {
 
     expect(wrapper.emitted('rewind')).toHaveLength(1)
   })
+
   test('emit "fastforward" event while fastforward button clicked', () => {
     const wrapper = shallowMount(BasePlayerNavs)
     const button = wrapper.find('.fastforward-button')
@@ -16,6 +17,7 @@ describe('BasePlayerNavs', () => {
 
     expect(wrapper.emitted('fastforward')).toHaveLength(1)
   })
+
   test('emit "backward" event while backward button clicked', () => {
     const wrapper = shallowMount(BasePlayerNavs)
     const button = wrapper.find('.backward-button')
@@ -23,6 +25,7 @@ describe('BasePlayerNavs', () => {
 
     expect(wrapper.emitted('backward')).toHaveLength(1)
   })
+
   test('emit "forward" event while forward button clicked', () => {
     const wrapper = shallowMount(BasePlayerNavs)
     const button = wrapper.find('.forward-button')
@@ -30,24 +33,31 @@ describe('BasePlayerNavs', () => {
 
     expect(wrapper.emitted('forward')).toHaveLength(1)
   })
-  test('if "showTracksNav" is false, hide container of forward/backward buttons, vice versa', () => {
+
+  test('if "showTracksNav" is false, hide container of forward/backward buttons, otherwise show the buttons', () => {
     let wrapper = shallowMount(BasePlayerNavs, {
       propsData: {
         showTracksNav: false
       }
     })
-    let container = wrapper.find('.tracks-nav')
+    let buttonForward = wrapper.find('.forward-button')
+    let buttonBackward = wrapper.find('.backward-button')
 
-    expect(container.element.style.display).toBe('none')
+    expect(buttonForward.element.style.display).toBe('none')
+    expect(buttonBackward.element.style.display).toBe('none')
 
     wrapper = shallowMount(BasePlayerNavs, {
       propsData: {
         showTracksNav: true
       }
     })
-    container = wrapper.find('.tracks-nav')
-    expect(container.element.style.display).not.toBe('none')
+    buttonForward = wrapper.find('.forward-button')
+    buttonBackward = wrapper.find('.backward-button')
+
+    expect(buttonForward.element.style.display).not.toBe('none')
+    expect(buttonBackward.element.style.display).not.toBe('none')
   })
+
   test('if "isPlaying" props is true, main button will be pause button', () => {
     const wrapper = shallowMount(BasePlayerNavs, {
       propsData: {
@@ -62,6 +72,7 @@ describe('BasePlayerNavs', () => {
 
     expect(wrapper.emitted('pause')).toHaveLength(1)
   })
+
   test('if "isPlaying" props is false, main button will be play button', () => {
     const wrapper = shallowMount(BasePlayerNavs, {
       propsData: {
@@ -75,5 +86,26 @@ describe('BasePlayerNavs', () => {
     button.trigger('click')
 
     expect(wrapper.emitted('play')).toHaveLength(1)
+  })
+})
+
+describe('snapshot tests', () => {
+  test('renders component correctly if showTracksNav is false', () => {
+    const wrapper = shallowMount(BasePlayerNavs, {
+      propsData: {
+        showTracksNav: false
+      }
+    })
+
+    expect(wrapper.element).toMatchSnapshot()
+  })
+  test('renders component correctly if showTracksNav is true', () => {
+    const wrapper = shallowMount(BasePlayerNavs, {
+      propsData: {
+        showTracksNav: true
+      }
+    })
+
+    expect(wrapper.element).toMatchSnapshot()
   })
 })
