@@ -1,15 +1,20 @@
 <template>
   <div>
-    <BasePlayerCover />
+    <Demo
+      :to="'/test'"
+      :text="'textxxxxxxxx'"
+      :time-current="123"
+      :time-total="12345"
+    />
   </div>
 </template>
 
 <script>
-import BasePlayerCover from '~/components/PlayerRefactor/BasePlayerCover.vue'
+import Demo from '~/components/PlayerRefactor/BasePlayerInfo.vue'
 
 export default {
   components: {
-    BasePlayerCover
+    Demo
   }
 }
 </script>

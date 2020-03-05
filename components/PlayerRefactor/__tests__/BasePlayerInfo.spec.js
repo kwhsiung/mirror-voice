@@ -39,6 +39,7 @@ describe('BasePlayerInfo title', () => {
 
     expect(link.props().to).toBe(to)
   })
+
   test('render text received from "text" props', () => {
     const text = 'test title'
     const wrapper = createWrapper({
@@ -64,6 +65,7 @@ describe('BasePlayerInfo time', () => {
 
     expect(timeTotal.text()).toBe('00:20:00')
   })
+
   test('render formatted "timeCurrent" received from props', () => {
     const timeInSecond = 1200
     const wrapper = createWrapper({
@@ -74,5 +76,20 @@ describe('BasePlayerInfo time', () => {
     const timeCurrent = wrapper.find('.time-current')
 
     expect(timeCurrent.text()).toBe('00:20:00')
+  })
+})
+
+describe('snapshot tests', () => {
+  test('renders component correctly if we provide efficient props', () => {
+    const wrapper = createWrapper({
+      propsData: {
+        to: '/test',
+        text: 'test text',
+        timeCurrent: 123,
+        timeTotal: 12345
+      }
+    })
+
+    expect(wrapper.element).toMatchSnapshot()
   })
 })
