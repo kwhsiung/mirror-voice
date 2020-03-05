@@ -1,14 +1,13 @@
 <template>
   <div>
     <Demo
-      :is-playing="false"
-      :show-tracks-nav="true"
+      style="margin-top: 500px"
     />
   </div>
 </template>
 
 <script>
-import Demo from '~/components/PlayerRefactor/BasePlayerNavs.vue'
+import Demo from '~/components/PlayerRefactor/BasePlayerRate.vue'
 
 export default {
   components: {

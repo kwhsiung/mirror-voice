@@ -9,5 +9,9 @@ module.exports = {
     '^.+\\.js$': 'babel-jest',
     '.*\\.(vue)$': 'vue-jest'
   },
-  snapshotSerializers: ['jest-serializer-vue']
+  snapshotSerializers: ['jest-serializer-vue'],
+  setupFiles: [
+    './plugins/vueDirectivesGlobal.js',
+    './plugins/vuePluginsGlobal.js'
+  ]
 }

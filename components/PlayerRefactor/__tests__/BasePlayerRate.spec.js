@@ -14,6 +14,7 @@ describe('BasePlayerRate', () => {
 
     expect(button.text()).toBe(`X ${playbackRateCurrent.toString()}`)
   })
+
   test('has "active" class on list item of current playbackrate', () => {
     const playbackRateCurrentIndex = 1
     const playbackRateCurrent = ratesAvailable[playbackRateCurrentIndex]
@@ -34,6 +35,7 @@ describe('BasePlayerRate', () => {
 
     expect(listItemsNotActive.length).toBe(ratesAvailable.length - 1)
   })
+
   test('emit "update:playbackRateCurrent" with different rate value while rate list item clicked', () => {
     const playbackRateChangedIndex = 1
     const playbackRateChanged = ratesAvailable[playbackRateChangedIndex]
@@ -45,5 +47,13 @@ describe('BasePlayerRate', () => {
     expect(wrapper.emitted('update:playbackRateCurrent')[0]).toEqual([
       playbackRateChanged
     ])
+  })
+})
+
+describe('snapshot tests', () => {
+  test('renders component correctly', () => {
+    const wrapper = shallowMount(BasePlayerRate)
+
+    expect(wrapper.element).toMatchSnapshot()
   })
 })
