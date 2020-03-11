@@ -114,4 +114,5 @@ export default {
   .button-toggler
     min-width 50px
     font-size 15px
+    text-align left
 </style>

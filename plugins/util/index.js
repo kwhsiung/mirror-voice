@@ -5,6 +5,7 @@ import getImgs from './getImgs'
 import secondsToHms from './secondsToHms'
 import getSingleSoundSrc from './getSingleSoundSrc'
 import getHtmlText from './getHtmlText'
+import normalizeSingle from './normalizeSingle'
 
 export default (context, inject) => {
   inject('buildQuery', buildQuery)
@@ -14,4 +15,5 @@ export default (context, inject) => {
   inject('secondsToHms', secondsToHms)
   inject('getSingleSoundSrc', getSingleSoundSrc)
   inject('getHtmlText', getHtmlText)
+  inject('normalizeSingle', normalizeSingle)
 }

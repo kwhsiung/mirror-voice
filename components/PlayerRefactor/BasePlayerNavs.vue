@@ -79,11 +79,6 @@ export default {
       default: false
     }
   },
-  computed: {
-    mainButtonNextEvent() {
-      return this.isPlaying ? 'pause' : 'play'
-    }
-  },
   methods: {
     handleClickRewind() {
       this.$emit('rewind')
@@ -98,7 +93,7 @@ export default {
       this.$emit('forward')
     },
     handleClickMain() {
-      this.$emit(this.mainButtonNextEvent)
+      this.$emit('update:isPlaying', !this.isPlaying)
     }
   }
 }

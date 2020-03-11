@@ -2,6 +2,7 @@
   <VueSlider
     v-model="value"
     class="slider"
+    :style="{ padding: '0' }"
     :rail-style="{ background }"
     v-bind="options"
   />
@@ -74,7 +75,11 @@ export default {
 <style lang="stylus" scoped>
 .slider
   cursor pointer
+  position relative
   & >>> .vue-slider-dot
     background-color #eeeeee
     border-radius 100%
+    position absolute
+  & >>> .vue-slider-rail
+    height 100%
 </style>

@@ -70,7 +70,7 @@ describe('BasePlayerNavs', () => {
 
     button.trigger('click')
 
-    expect(wrapper.emitted('pause')).toHaveLength(1)
+    expect(wrapper.emitted('update:isPlaying')[0]).toEqual([false])
   })
 
   test('if "isPlaying" props is false, main button will be play button', () => {
@@ -85,7 +85,7 @@ describe('BasePlayerNavs', () => {
 
     button.trigger('click')
 
-    expect(wrapper.emitted('play')).toHaveLength(1)
+    expect(wrapper.emitted('update:isPlaying')[0]).toEqual([true])
   })
 })
 

@@ -149,16 +149,36 @@ const fetchTracks = (app, albumId, isLatestFirst = true, page = 1) => {
   })
 }
 
-const fetchPlayerTracks = (store, albumId, isLatestFirst = true, page = 1) => {
-  return store.dispatch('appPlayer/FETCH', {
-    max_results: 10,
-    page,
-    sort: `${isLatestFirst ? '-' : ''}publishedDate`,
-    where: {
-      albums: {
-        $in: [albumId]
+// const fetchPlayerTracks = (store, albumId, isLatestFirst = true, page = 1) => {
+//   return store.dispatch('appPlayer/FETCH', {
+//     max_results: 10,
+//     page,
+//     sort: `${isLatestFirst ? '-' : ''}publishedDate`,
+//     where: {
+//       albums: {
+//         $in: [albumId]
+//       }
+//     }
+//   })
+// }
+
+const fetchSingles = (
+  store,
+  { albumId = '', sort = 'publishedDate', page = 1 }
+) => {
+  return store.dispatch('appPlayerRefactor/FETCH_SINGLES', {
+    payload: {
+      max_results: 10,
+      page,
+      sort,
+      where: {
+        albums: {
+          $in: [albumId]
+        }
       }
-    }
+    },
+    albumId,
+    autoPlay: true
   })
 }
 
@@ -207,6 +227,7 @@ export default {
     },
 
     ...mapState(['appPlayer']),
+    ...mapState(['appPlayerRefactor']),
     currentSound() {
       return _.get(this.list, this.appPlayer.playingIndex, {})
     },
@@ -218,8 +239,9 @@ export default {
         **    if ids are equal, we can say current album is playing
         */
         return (
-          this.appPlayer.isPlaying &&
-          this.appPlayer.albumId === _.get(this.album, 'id', '')
+          this.appPlayerRefactor.audioIsPlaying &&
+          this.appPlayerRefactor.playerCurrentAlbumId ===
+            _.get(this.album, 'id', '')
         )
       },
       set(val) {
@@ -227,7 +249,7 @@ export default {
           this.playAlbum()
         } else {
           // pause
-          this.SET_IS_PLAYING(false)
+          this.SET_AUDIO_IS_PLAYING(false)
         }
       }
     },
@@ -379,11 +401,23 @@ export default {
       PREPARE_SINGLES: 'appPlayer/PREPARE_SINGLES'
     }),
     playAlbum(albumId = this.album.id) {
-      this.SET_PLAYED_TIME(0)
-      fetchPlayerTracks(this.$store, albumId, false)
+      // this.SET_PLAYED_TIME(0)
+      // fetchPlayerTracks(this.$store, albumId, false)
+      fetchSingles(this.$store, { albumId })
       this.$sendGAAlbum({ action: 'click', label: 'play all' })
     },
 
+    ...mapMutations({
+      SET_AUDIO_IS_PLAYING: 'appPlayerRefactor/SET_AUDIO_IS_PLAYING',
+      SET_AUDIO_VOLUME: 'appPlayerRefactor/SET_AUDIO_VOLUME',
+      SET_AUDIO_PLAYBACK_RATE: 'appPlayerRefactor/SET_AUDIO_PLAYBACK_RATE',
+      SET_AUDIO_CURRENT_TIME: 'appPlayerRefactor/SET_AUDIO_CURRENT_TIME',
+      SET_AUDIO_DURATION: 'appPlayerRefactor/SET_AUDIO_DURATION',
+      SET_UPDATE_TIME: 'appPlayerRefactor/SET_UPDATE_TIME',
+      SET_AUDIO_CURRENT_INDEX: 'appPlayerRefactor/SET_AUDIO_CURRENT_INDEX',
+      SET_AUDIO_LIST: 'appPlayerRefactor/SET_AUDIO_LIST',
+      PUSH_AUDIO_LIST: 'appPlayerRefactor/PUSH_AUDIO_LIST'
+    }),
     ...mapMutations({
       SET_PLAYING_INDEX: 'appPlayer/SET_PLAYING_INDEX',
       SET_PLAYED_TIME: 'appPlayer/SET_PLAYED_TIME',
