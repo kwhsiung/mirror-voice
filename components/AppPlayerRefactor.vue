@@ -35,7 +35,13 @@ export default {
       audioDurationState: state => state.appPlayerRefactor.audioDuration,
       updateTimeState: state => state.appPlayerRefactor.updateTime,
       audioListState: state => state.appPlayerRefactor.audioList,
-      audioCurrentIndexState: state => state.appPlayerRefactor.audioCurrentIndex
+      audioCurrentIndexState: state =>
+        state.appPlayerRefactor.audioCurrentIndex,
+      audioCurrentAlbumId: state => state.appPlayerRefactor.audioCurrentAlbumId,
+      payloadNextAudioList: state =>
+        state.appPlayerRefactor.payloadNextAudioList,
+      payloadPrevAudioList: state =>
+        state.appPlayerRefactor.payloadPrevAudioList
     }),
     $$isPlaying: {
       get() {
@@ -91,6 +97,32 @@ export default {
           value: this.audioCurrentTimeState
         })
       }
+    },
+    $$audioCurrentIndex(value) {
+      const payloadNextExist = this.payloadNextAudioList !== null
+      const payloadPrevExist = this.payloadPrevAudioList !== null
+      const shouldFetchNextPageAt = this.audioListState.length - 1
+      const shouldFetchPrevPageAt = 0
+      const shouldFetchNextPage = value >= shouldFetchNextPageAt
+      const shouldFetchPrevPage = value <= shouldFetchPrevPageAt
+      const albumId = this.audioCurrentAlbumId
+      if (shouldFetchNextPage && payloadNextExist) {
+        this.FETCH_SINGLES({
+          payload: this.payloadNextAudioList,
+          albumId,
+          playAt: value,
+          autoPlay: true,
+          append: 'push'
+        })
+      } else if (shouldFetchPrevPage && payloadPrevExist) {
+        this.FETCH_SINGLES({
+          payload: this.payloadPrevAudioList,
+          albumId,
+          playAt: 10,
+          autoPlay: true,
+          append: 'unshift'
+        })
+      }
     }
   },
   created() {
@@ -119,7 +151,8 @@ export default {
       PUSH_AUDIO_LIST: 'appPlayerRefactor/PUSH_AUDIO_LIST'
     }),
     ...mapActions({
-      RESET_AUDIO_LIST: 'appPlayerRefactor/RESET_AUDIO_LIST'
+      RESET_AUDIO_LIST: 'appPlayerRefactor/RESET_AUDIO_LIST',
+      FETCH_SINGLES: 'appPlayerRefactor/FETCH_SINGLES'
     }),
     ...mapMutations({
       SET_SHOW_LIGHTBOX: 'lightboxPlayingError/SET_SHOW_LIGHTBOX'

@@ -75,11 +75,12 @@
         <BaseTrackList
           v-show="!isDesktop || isTracksFetched"
           class="tracks-wrapper__tracks"
+          :enable-transition="false"
           :show-list-order="true"
           :show-played-progress="true"
           :is-latest-first="isTracksSortLatestFirst"
           :current-sound="currentSound"
-          :is-playing="appPlayer.isPlaying"
+          :is-playing="appPlayerRefactor.audioIsPlaying"
           :tracks="tracksWithPlayedProgress"
           :page="page"
           :total="tracks.meta.total"
@@ -149,22 +150,9 @@ const fetchTracks = (app, albumId, isLatestFirst = true, page = 1) => {
   })
 }
 
-// const fetchPlayerTracks = (store, albumId, isLatestFirst = true, page = 1) => {
-//   return store.dispatch('appPlayer/FETCH', {
-//     max_results: 10,
-//     page,
-//     sort: `${isLatestFirst ? '-' : ''}publishedDate`,
-//     where: {
-//       albums: {
-//         $in: [albumId]
-//       }
-//     }
-//   })
-// }
-
 const fetchSingles = (
   store,
-  { albumId = '', sort = 'publishedDate', page = 1 }
+  { albumId = '', playAt = 0, sort = 'publishedDate', page = 1, append = null }
 ) => {
   return store.dispatch('appPlayerRefactor/FETCH_SINGLES', {
     payload: {
@@ -178,7 +166,9 @@ const fetchSingles = (
       }
     },
     albumId,
-    autoPlay: true
+    playAt,
+    autoPlay: true,
+    append
   })
 }
 
@@ -229,7 +219,11 @@ export default {
     ...mapState(['appPlayer']),
     ...mapState(['appPlayerRefactor']),
     currentSound() {
-      return _.get(this.list, this.appPlayer.playingIndex, {})
+      return _.get(
+        this.appPlayerRefactor.audioList,
+        this.appPlayerRefactor.audioCurrentIndex,
+        {}
+      )
     },
     isAlbumPlaying: {
       get() {
@@ -240,7 +234,7 @@ export default {
         */
         return (
           this.appPlayerRefactor.audioIsPlaying &&
-          this.appPlayerRefactor.playerCurrentAlbumId ===
+          this.appPlayerRefactor.audioCurrentAlbumId ===
             _.get(this.album, 'id', '')
         )
       },
@@ -308,7 +302,7 @@ export default {
   },
   watch: {
     isTracksSortLatestFirst() {
-      this.fetchTracks(1)
+      this.fetchTracks(this.page)
     },
     page() {
       this.fetchTracks(this.page)
@@ -416,7 +410,8 @@ export default {
       SET_UPDATE_TIME: 'appPlayerRefactor/SET_UPDATE_TIME',
       SET_AUDIO_CURRENT_INDEX: 'appPlayerRefactor/SET_AUDIO_CURRENT_INDEX',
       SET_AUDIO_LIST: 'appPlayerRefactor/SET_AUDIO_LIST',
-      PUSH_AUDIO_LIST: 'appPlayerRefactor/PUSH_AUDIO_LIST'
+      PUSH_AUDIO_LIST: 'appPlayerRefactor/PUSH_AUDIO_LIST',
+      SET_FETCH_PAYLOAD: 'appPlayerRefactor/SET_FETCH_PAYLOAD'
     }),
     ...mapMutations({
       SET_PLAYING_INDEX: 'appPlayer/SET_PLAYING_INDEX',
@@ -426,36 +421,52 @@ export default {
       CLEAR_PAGES: 'appPlayer/CLEAR_PAGES',
       SET_IS_PLAYING: 'appPlayer/SET_IS_PLAYING'
     }),
+    ...mapActions({
+      RESET_AUDIO_LIST: 'appPlayerRefactor/RESET_AUDIO_LIST'
+    }),
     playTrack(slug) {
-      this.SET_ALBUM_ID(this.album.id)
-      this.SET_ALBUM_COVER(
-        _.get(this.$getImgs(this.album), ['mobile', 'url'], '')
-      )
-      this.CLEAR_PAGES()
-
-      /*
-      ** Check track items are sorted by latest published date or not
-      ** if not, reverse track items.
-      */
-      let tracks
-      if (this.isTracksSortLatestFirst) {
-        tracks = this.tracks
-      } else {
-        const itemsReversed = [...this.tracks.items].reverse()
-        tracks = { ...this.tracks, items: itemsReversed }
-      }
-
-      this.SET_PLAYED_TIME(0)
-      this.PREPARE_SINGLES({ page: this.page, res: tracks }).then(() => {
-        const playingIndex = _.findIndex(this.list, o => o.slug === slug)
-        this.SET_PLAYING_INDEX(playingIndex)
-
-        const single = _.find(this.tracksWithPlayedProgress, o => {
-          const _slug = _.get(o, 'slug', '')
-          return _slug === slug
-        })
-        this.SET_PLAYED_TIME(_.get(single, 'playedTime', 0))
+      // /*
+      // ** Check track items are sorted by latest published date or not
+      // ** if not, reverse track items.
+      // */
+      // let tracks
+      // if (this.isTracksSortLatestFirst) {
+      //   tracks = this.tracks
+      // } else {
+      //   const itemsReversed = [...this.tracks.items].reverse()
+      //   tracks = { ...this.tracks, items: itemsReversed }
+      // }
+      const tracks = this.tracks
+      const items = _.get(tracks, 'items', [])
+      const playAt = _.findIndex(items, o => {
+        const _slug = _.get(o, 'slug', '')
+        return _slug === slug
       })
+      this.RESET_AUDIO_LIST({
+        list: items.map(item => this.$normalizeSingle(item)),
+        albumId: _.get(this.album, 'id', ''),
+        playAt,
+        autoPlay: true
+      })
+
+      // send links info to appPlayer's store, for load more tracks
+      const links = _.get(this.tracks, 'links', {})
+      const hrefPrev = _.get(links, ['prev', 'href'], '')
+      const hrefNext = _.get(links, ['next', 'href'], '')
+      if (hrefPrev !== '') {
+        const hrefPrevParsed = this.$toPayloadObject({
+          maxResults: 10,
+          payloadString: hrefPrev.replace('posts', '')
+        })
+        this.SET_FETCH_PAYLOAD({ where: 'prev', payload: hrefPrevParsed })
+      }
+      if (hrefNext !== '') {
+        const hrefNextParsed = this.$toPayloadObject({
+          maxResults: 10,
+          payloadString: hrefNext.replace('posts', '')
+        })
+        this.SET_FETCH_PAYLOAD({ where: 'next', payload: hrefNextParsed })
+      }
 
       this.$sendGAAlbum({ action: 'click', label: 'play single' })
     },

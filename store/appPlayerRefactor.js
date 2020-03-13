@@ -8,9 +8,11 @@ export const state = () => ({
   audioDuration: 0,
   updateTime: 0,
   audioList: [],
-  audioCurrentIndex: 0,
+  payloadPrevAudioList: null,
+  payloadNextAudioList: null,
+  audioCurrentIndex: -1,
 
-  playerCurrentAlbumId: null
+  audioCurrentAlbumId: null
 })
 
 export const mutations = {
@@ -36,36 +38,93 @@ export const mutations = {
     state.audioCurrentIndex = value
   },
   SET_ALBUM_ID(state, value) {
-    state.playerCurrentAlbumId = value
+    state.audioCurrentAlbumId = value
   },
   SET_AUDIO_LIST(state, list) {
     state.audioList = list
   },
   PUSH_AUDIO_LIST(state, list) {
     state.audioList.push(...list)
+  },
+  UNSHIFT_AUDIO_LIST(state, list) {
+    state.audioList.unshift(...list)
+  },
+  SET_FETCH_PAYLOAD(state, { where = 'prev', payload }) {
+    if (where === 'prev') {
+      state.payloadPrevAudioList = payload
+    } else if (where === 'next') {
+      state.payloadNextAudioList = payload
+    }
   }
 }
 
 export const actions = {
   RESET_AUDIO_LIST(
     { commit },
-    { list = [], albumId = null, autoPlay = false }
+    {
+      list = [],
+      links = {},
+      albumId = null,
+      playAt = 0,
+      autoPlay = false,
+      append = null
+    }
   ) {
-    commit('SET_AUDIO_LIST', list)
+    if (!append) {
+      commit('SET_AUDIO_LIST', list)
+    } else if (append === 'push') {
+      commit('PUSH_AUDIO_LIST', list)
+    } else if (append === 'unshift') {
+      commit('UNSHIFT_AUDIO_LIST', list)
+    }
+
+    const hrefPrev = _.get(links, ['prev', 'href'], '')
+    const hrefNext = _.get(links, ['next', 'href'], '')
+    if (hrefPrev !== '') {
+      commit('SET_FETCH_PAYLOAD', {
+        where: 'prev',
+        payload: this.$toPayloadObject({
+          maxResults: 10,
+          payloadString: hrefPrev.replace('posts', '')
+        })
+      })
+    }
+    if (hrefNext !== '') {
+      commit('SET_FETCH_PAYLOAD', {
+        where: 'next',
+        payload: this.$toPayloadObject({
+          maxResults: 10,
+          payloadString: hrefNext.replace('posts', '')
+        })
+      })
+    }
+
     commit('SET_AUDIO_CURRENT_INDEX', 0)
     commit('SET_UPDATE_TIME', 0)
     commit('SET_AUDIO_IS_PLAYING', autoPlay)
     commit('SET_ALBUM_ID', albumId)
+    commit('SET_AUDIO_CURRENT_INDEX', playAt)
   },
   async FETCH_SINGLES(
     { dispatch },
-    { payload = {}, albumId = null, autoPlay = false }
+    {
+      payload = {},
+      albumId = null,
+      playAt = 0,
+      autoPlay = false,
+      append = null
+    }
   ) {
-    const { items = [] } = await this.$fetchSingle(payload)
+    const { items = [], links = {} } = await this.$fetchSingle(
+      _.cloneDeep(payload)
+    )
     dispatch('RESET_AUDIO_LIST', {
       list: items.map(item => this.$normalizeSingle(item)),
+      links,
       albumId,
-      autoPlay
+      playAt,
+      autoPlay,
+      append
     })
   }
 }
