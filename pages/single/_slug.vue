@@ -114,10 +114,6 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({
-      list: 'appPlayer/LIST'
-    }),
-
     content() {
       return sanitizeContent(_.get(this.single, ['content', 'html'], ''))
     },
@@ -125,13 +121,14 @@ export default {
       return this.$getHtmlText(this.content)
     },
 
-    ...mapState(['appPlayer']),
-    appPlayerSingleSlug() {
-      return _.get(this.list, [this.appPlayer.playingIndex, 'slug'], '')
-    },
+    ...mapGetters({
+      appPlayerSingleSlug: 'appPlayerRefactor/currentSlug'
+    }),
     isSlugEqualToTrackInPlayer() {
       return this.appPlayerSingleSlug === _.get(this.single, 'slug', '')
     },
+
+    ...mapState(['appPlayerRefactor']),
     isSinglePlaying: {
       get() {
         /*
@@ -139,7 +136,10 @@ export default {
         ** 2. track's slug in player === single's slug on current page
         **    if slugs are equal, we can say current single is playing
         */
-        return this.appPlayer.isPlaying && this.isSlugEqualToTrackInPlayer
+        return (
+          this.appPlayerRefactor.audioIsPlaying &&
+          this.isSlugEqualToTrackInPlayer
+        )
       },
       set(val) {
         if (val) {
@@ -147,11 +147,12 @@ export default {
             this.playSingle()
           } else {
             // continue
-            this.SET_IS_PLAYING(true)
+            // this.SET_IS_PLAYING(true)
+            this.SET_AUDIO_IS_PLAYING(true)
           }
         } else {
           // pause
-          this.SET_IS_PLAYING(false)
+          this.SET_AUDIO_IS_PLAYING(false)
         }
 
         this.$sendGASingle({ action: 'click', label: 'play current single' })
@@ -235,27 +236,26 @@ export default {
     }
   },
   methods: {
-    ...mapActions({
-      PREPARE_SINGLES: 'appPlayer/PREPARE_SINGLES'
-    }),
     ...mapMutations({
-      SET_PLAYING_INDEX: 'appPlayer/SET_PLAYING_INDEX',
-      SET_ALBUM_ID: 'appPlayer/SET_ALBUM_ID',
-      SET_ALBUM_COVER: 'appPlayer/SET_ALBUM_COVER',
-      CLEAR_PAGES: 'appPlayer/CLEAR_PAGES',
-      SET_IS_PLAYING: 'appPlayer/SET_IS_PLAYING'
+      SET_AUDIO_IS_PLAYING: 'appPlayerRefactor/SET_AUDIO_IS_PLAYING',
+      SET_AUDIO_VOLUME: 'appPlayerRefactor/SET_AUDIO_VOLUME',
+      SET_AUDIO_PLAYBACK_RATE: 'appPlayerRefactor/SET_AUDIO_PLAYBACK_RATE',
+      SET_AUDIO_CURRENT_TIME: 'appPlayerRefactor/SET_AUDIO_CURRENT_TIME',
+      SET_AUDIO_DURATION: 'appPlayerRefactor/SET_AUDIO_DURATION',
+      SET_UPDATE_TIME: 'appPlayerRefactor/SET_UPDATE_TIME',
+      SET_AUDIO_CURRENT_INDEX: 'appPlayerRefactor/SET_AUDIO_CURRENT_INDEX',
+      SET_AUDIO_LIST: 'appPlayerRefactor/SET_AUDIO_LIST',
+      PUSH_AUDIO_LIST: 'appPlayerRefactor/PUSH_AUDIO_LIST',
+      SET_FETCH_PAYLOAD: 'appPlayerRefactor/SET_FETCH_PAYLOAD'
+    }),
+    ...mapActions({
+      RESET_AUDIO_LIST: 'appPlayerRefactor/RESET_AUDIO_LIST'
     }),
     playSingle() {
-      this.SET_ALBUM_ID(this.album.id)
-      this.SET_ALBUM_COVER(
-        _.get(this.$getImgs(this.album), ['mobile', 'url'], '')
-      )
-      this.CLEAR_PAGES()
-      this.PREPARE_SINGLES({ page: 1, res: { items: [this.single] } }).then(
-        () => {
-          this.SET_PLAYING_INDEX(0)
-        }
-      )
+      this.RESET_AUDIO_LIST({
+        list: [this.$normalizeSingle(this.single)],
+        autoPlay: true
+      })
     },
 
     handleClickLink() {

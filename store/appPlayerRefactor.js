@@ -80,24 +80,29 @@ export const actions = {
 
     const hrefPrev = _.get(links, ['prev', 'href'], '')
     const hrefNext = _.get(links, ['next', 'href'], '')
-    if (hrefPrev !== '') {
-      commit('SET_FETCH_PAYLOAD', {
-        where: 'prev',
-        payload: this.$toPayloadObject({
-          maxResults: 10,
-          payloadString: hrefPrev.replace('posts', '')
-        })
-      })
-    }
-    if (hrefNext !== '') {
-      commit('SET_FETCH_PAYLOAD', {
-        where: 'next',
-        payload: this.$toPayloadObject({
-          maxResults: 10,
-          payloadString: hrefNext.replace('posts', '')
-        })
-      })
-    }
+    const payloadPrev =
+      hrefPrev !== ''
+        ? this.$toPayloadObject({
+            maxResults: 10,
+            payloadString: hrefPrev.replace('posts', '')
+          })
+        : null
+    const payloadNext =
+      hrefNext !== ''
+        ? this.$toPayloadObject({
+            maxResults: 10,
+            payloadString: hrefNext.replace('posts', '')
+          })
+        : null
+
+    commit('SET_FETCH_PAYLOAD', {
+      where: 'prev',
+      payload: payloadPrev
+    })
+    commit('SET_FETCH_PAYLOAD', {
+      where: 'next',
+      payload: payloadNext
+    })
 
     commit('SET_AUDIO_CURRENT_INDEX', 0)
     commit('SET_UPDATE_TIME', 0)
