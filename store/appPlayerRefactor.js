@@ -68,7 +68,7 @@ export const actions = {
       playAt = 0,
       autoPlay = false,
       append = null
-    }
+    } = {}
   ) {
     if (!append) {
       commit('SET_AUDIO_LIST', list)
@@ -104,7 +104,6 @@ export const actions = {
       payload: payloadNext
     })
 
-    commit('SET_AUDIO_CURRENT_INDEX', 0)
     commit('SET_UPDATE_TIME', 0)
     commit('SET_AUDIO_IS_PLAYING', autoPlay)
     commit('SET_ALBUM_ID', albumId)
@@ -118,7 +117,7 @@ export const actions = {
       playAt = 0,
       autoPlay = false,
       append = null
-    }
+    } = {}
   ) {
     const { items = [], links = {} } = await this.$fetchSingle(
       _.cloneDeep(payload)
