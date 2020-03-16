@@ -213,7 +213,7 @@ describe('actions', () => {
   })
 
   test('FETCH_SINGLES', async () => {
-    expect.assertions(1)
+    expect.assertions(2)
 
     const albumId = 'testAlbumId'
     const playAt = 12
@@ -263,6 +263,7 @@ describe('actions', () => {
     )
     await flushPromises()
 
+    expect(_actions.$fetchSingle).toHaveBeenCalledTimes(1)
     expect(dispatch).toHaveBeenCalledWith('RESET_AUDIO_LIST', {
       list: [
         {
