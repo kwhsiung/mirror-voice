@@ -1,6 +1,9 @@
 import _ from 'lodash'
+import { v4 as uuidv4 } from 'uuid'
+import Vue from 'vue'
 
 export const state = () => ({
+  uuid: uuidv4(),
   audioIsPlaying: false,
   audioVolume: 1,
   audioPlaybackRate: 1,
@@ -18,6 +21,16 @@ export const state = () => ({
 export const mutations = {
   SET_AUDIO_IS_PLAYING(state, value) {
     state.audioIsPlaying = value
+
+    const currentPlayings = this.state.appPlayerCurrentPlaying.uuids
+    Vue.set(currentPlayings, state.uuid, value)
+    if (value) {
+      Object.keys(currentPlayings).forEach(key => {
+        if (key !== state.uuid) {
+          Vue.set(currentPlayings, key, false)
+        }
+      })
+    }
   },
   SET_AUDIO_VOLUME(state, value) {
     state.audioVolume = value

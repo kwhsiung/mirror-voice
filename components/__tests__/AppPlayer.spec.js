@@ -4,7 +4,8 @@ import _ from 'lodash'
 import flushPromises from 'flush-promises'
 import AppPlayer from '../AppPlayerRefactor.vue'
 import BasePlayer from '../PlayerRefactor/BasePlayer.vue'
-import { state, mutations, actions, getters } from '~/store/appPlayerRefactor'
+import * as appPlayerStoreConfig from '~/store/appPlayerRefactor'
+import * as appPlayerCurrentPlayingStoreConfig from '~/store/appPlayerCurrentPlaying'
 
 const localVue = createLocalVue()
 localVue.use(Vuex)
@@ -27,10 +28,11 @@ const createStore = overrides => {
     modules: {
       appPlayerRefactor: {
         namespaced: true,
-        state,
-        mutations,
-        actions,
-        getters
+        ...appPlayerStoreConfig
+      },
+      appPlayerCurrentPlaying: {
+        namespaced: true,
+        ...appPlayerCurrentPlayingStoreConfig
       }
     }
   }
@@ -63,7 +65,7 @@ const createWrapper = overrides => {
 describe('test actions independently', () => {
   test('RESET_AUDIO_LIST', () => {
     const commit = jest.fn()
-    actions.RESET_AUDIO_LIST({ commit }, { list: [] })
+    appPlayerStoreConfig.actions.RESET_AUDIO_LIST({ commit }, { list: [] })
 
     expect(commit).toHaveBeenCalledWith('SET_AUDIO_LIST', [])
     expect(commit).toHaveBeenCalledWith('SET_AUDIO_CURRENT_INDEX', 0)
@@ -101,6 +103,7 @@ describe('data binding with store', () => {
         appPlayerRefactor: {
           namespaced: true,
           state: () => ({
+            uuid: 'mock-uuid',
             audioIsPlaying,
             audioVolume,
             audioPlaybackRate,
@@ -110,16 +113,24 @@ describe('data binding with store', () => {
             audioList,
             audioCurrentIndex
           }),
-          mutations,
-          actions,
-          getters
+          mutations: appPlayerStoreConfig.mutations,
+          actions: appPlayerStoreConfig.actions,
+          getters: appPlayerStoreConfig.getters
+        },
+        appPlayerCurrentPlaying: {
+          namespaced: true,
+          state: () => ({
+            uuids: {
+              'mock-uuid': true
+            }
+          })
         }
       }
     })
     const wrapper = createWrapper({ store })
     const player = wrapper.find(BasePlayer)
 
-    expect(player.props().isPlaying).toBe(audioIsPlaying)
+    expect(player.props().isPlaying).toBe(true)
     expect(player.props().volume).toBe(audioVolume)
     expect(player.props().playbackRate).toBe(audioPlaybackRate)
     expect(player.props().currentTime).toBe(audioCurrentTime)
@@ -127,6 +138,61 @@ describe('data binding with store', () => {
     expect(player.props().audioList).toEqual(audioList)
     expect(player.props().audioCurrentIndex).toEqual(audioCurrentIndex)
     expect(wrapper.vm.currentSlug).toBe(audioList[audioCurrentIndex].slug)
+  })
+
+  test('should not playing if "audioIsPlaying" is true, but current uuid not allow to playing', () => {
+    const audioIsPlaying = true
+    const audioVolume = 0.8
+    const audioPlaybackRate = 0.5
+    const audioCurrentTime = 1234
+    const audioDuration = 12345
+    const updateTime = 100
+    const audioList = [
+      {
+        title: 'first single',
+        slug: 'first-single',
+        audioSrc: 'http://first-single.wav',
+        coverImgSrc: 'http://first-single.jpg'
+      },
+      {
+        title: 'second single',
+        slug: 'second-single',
+        audioSrc: 'http://second-single.wav',
+        coverImgSrc: 'http://second-single.jpg'
+      }
+    ]
+    const audioCurrentIndex = 1
+
+    const store = createStore({
+      modules: {
+        appPlayerRefactor: {
+          namespaced: true,
+          state: () => ({
+            uuid: 'mock-uuid',
+            audioIsPlaying,
+            audioVolume,
+            audioPlaybackRate,
+            audioCurrentTime,
+            audioDuration,
+            updateTime,
+            audioList,
+            audioCurrentIndex
+          })
+        },
+        appPlayerCurrentPlaying: {
+          namespaced: true,
+          state: () => ({
+            uuids: {
+              'mock-uuid': false
+            }
+          })
+        }
+      }
+    })
+    const wrapper = createWrapper({ store })
+    const player = wrapper.find(BasePlayer)
+
+    expect(player.props().isPlaying).toBe(false)
   })
 
   test('commit "appPlayerRefactor/SET_AUDIO_IS_PLAYING" mutation when isPlaying state changed by player', () => {
@@ -265,6 +331,66 @@ describe('component lifecycle hooks', () => {
       { list: [] }
     )
   })
+
+  test('delete current appPlayer uuid in appPlayerCurrentPlaying when component beforeunload', () => {
+    const audioIsPlaying = true
+    const audioVolume = 0.8
+    const audioPlaybackRate = 0.5
+    const audioCurrentTime = 1234
+    const audioDuration = 12345
+    const updateTime = 100
+    const audioList = [
+      {
+        title: 'first single',
+        slug: 'first-single',
+        audioSrc: 'http://first-single.wav',
+        coverImgSrc: 'http://first-single.jpg'
+      },
+      {
+        title: 'second single',
+        slug: 'second-single',
+        audioSrc: 'http://second-single.wav',
+        coverImgSrc: 'http://second-single.jpg'
+      }
+    ]
+    const audioCurrentIndex = 1
+
+    const store = createStore({
+      modules: {
+        appPlayerRefactor: {
+          namespaced: true,
+          state: () => ({
+            uuid: 'mock-uuid',
+            audioIsPlaying,
+            audioVolume,
+            audioPlaybackRate,
+            audioCurrentTime,
+            audioDuration,
+            updateTime,
+            audioList,
+            audioCurrentIndex
+          }),
+          mutations: appPlayerStoreConfig.mutations,
+          actions: appPlayerStoreConfig.actions,
+          getters: appPlayerStoreConfig.getters
+        },
+        appPlayerCurrentPlaying: {
+          namespaced: true,
+          state: () => ({
+            uuids: {
+              'mock-uuid': true
+            }
+          })
+        }
+      }
+    })
+    const wrapper = createWrapper({ store })
+    window.dispatchEvent(new Event('beforeunload'))
+
+    expect(
+      wrapper.vm.$store.state.appPlayerCurrentPlaying.uuids
+    ).not.toHaveProperty('mock-uuid')
+  })
 })
 
 describe('snapshot tests', () => {
@@ -296,6 +422,7 @@ describe('snapshot tests', () => {
         appPlayerRefactor: {
           namespaced: true,
           state: () => ({
+            uuid: 'mock-uuid',
             audioIsPlaying,
             audioVolume,
             audioPlaybackRate,
@@ -305,9 +432,17 @@ describe('snapshot tests', () => {
             audioList,
             audioCurrentIndex
           }),
-          mutations,
-          actions,
-          getters
+          mutations: appPlayerStoreConfig.mutations,
+          actions: appPlayerStoreConfig.actions,
+          getters: appPlayerStoreConfig.getters
+        },
+        appPlayerCurrentPlaying: {
+          namespaced: true,
+          state: () => ({
+            uuids: {
+              'mock-uuid': true
+            }
+          })
         }
       }
     })

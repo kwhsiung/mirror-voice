@@ -145,7 +145,12 @@ module.exports = {
     [
       'nuxt-vuex-localstorage',
       {
-        localStorage: ['localStorageLastTrack', 'localStorageTrackHistory']
+        mode: 'debug',
+        localStorage: [
+          'localStorageLastTrack',
+          'localStorageTrackHistory',
+          'appPlayerCurrentPlaying'
+        ]
       }
     ],
     'vue-scrollto/nuxt'

@@ -27,6 +27,7 @@ export default {
   },
   computed: {
     ...mapState({
+      uuid: state => state.appPlayerRefactor.uuid,
       audioIsPlayingState: state => state.appPlayerRefactor.audioIsPlaying,
       audioVolumeState: state => state.appPlayerRefactor.audioVolume,
       audioPlaybackRateState: state =>
@@ -45,7 +46,10 @@ export default {
     }),
     $$isPlaying: {
       get() {
-        return this.audioIsPlayingState
+        return (
+          this.audioIsPlayingState &&
+          this.$store.state.appPlayerCurrentPlaying.uuids[this.uuid] === true
+        )
       },
       set(value) {
         this.SET_AUDIO_IS_PLAYING(value)
@@ -136,6 +140,10 @@ export default {
     }).then(({ items = [] }) => {
       const singleItems = items.map(item => this.$normalizeSingle(item))
       this.RESET_AUDIO_LIST({ list: singleItems })
+    })
+
+    window.addEventListener('beforeunload', () => {
+      this.$store.commit('appPlayerCurrentPlaying/DELETE_UUID', this.uuid)
     })
   },
   methods: {
