@@ -22,6 +22,12 @@ export const mutations = {
   SET_AUDIO_IS_PLAYING(state, value) {
     state.audioIsPlaying = value
 
+    /*
+    ** Toggle playing state in appPlayerCurrentPlaying store
+    ** in order to allow only one player playing simultaneously
+    ** should move these code to appPlayerCurrentPlaying.js
+    ** and refactor SET_AUDIO_IS_PLAYING to actions in the future
+    */
     const currentPlayings = this.state.appPlayerCurrentPlaying.uuids
     Vue.set(currentPlayings, state.uuid, value)
     if (value) {
