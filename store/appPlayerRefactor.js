@@ -20,8 +20,6 @@ export const state = () => ({
 
 export const mutations = {
   SET_AUDIO_IS_PLAYING(state, value) {
-    state.audioIsPlaying = value
-
     /*
     ** Toggle playing state in appPlayerCurrentPlaying store
     ** in order to allow only one player playing simultaneously
@@ -29,7 +27,6 @@ export const mutations = {
     ** and refactor SET_AUDIO_IS_PLAYING to actions in the future
     */
     const currentPlayings = this.state.appPlayerCurrentPlaying.uuids
-    Vue.set(currentPlayings, state.uuid, value)
     if (value) {
       Object.keys(currentPlayings).forEach(key => {
         if (key !== state.uuid) {
@@ -37,6 +34,9 @@ export const mutations = {
         }
       })
     }
+    Vue.set(currentPlayings, state.uuid, value)
+
+    state.audioIsPlaying = value
   },
   SET_AUDIO_VOLUME(state, value) {
     state.audioVolume = value
@@ -85,6 +85,7 @@ export const actions = {
       links = {},
       albumId = null,
       playAt = 0,
+      updateTime = 0,
       autoPlay = false,
       append = null
     } = {}
@@ -123,10 +124,10 @@ export const actions = {
       payload: payloadNext
     })
 
-    commit('SET_UPDATE_TIME', 0)
+    commit('SET_UPDATE_TIME', updateTime)
+    commit('SET_AUDIO_CURRENT_INDEX', playAt)
     commit('SET_AUDIO_IS_PLAYING', autoPlay)
     commit('SET_ALBUM_ID', albumId)
-    commit('SET_AUDIO_CURRENT_INDEX', playAt)
   },
   async FETCH_SINGLES(
     { dispatch },

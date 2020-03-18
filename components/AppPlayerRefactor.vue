@@ -127,6 +127,14 @@ export default {
           append: 'unshift'
         })
       }
+    },
+    $$currentTime(value) {
+      this.$store.commit('localStorageTrackHistoryRefactor/MEMORIZE_TRACK', {
+        track: this.audioListState[this.$$audioCurrentIndex],
+        memorizedDate: new Date(),
+        memorizedDuration: this.audioDurationState,
+        memorizedCurrentTime: value
+      })
     }
   },
   created() {

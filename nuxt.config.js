@@ -149,6 +149,7 @@ module.exports = {
         localStorage: [
           'localStorageLastTrack',
           'localStorageTrackHistory',
+          'localStorageTrackHistoryRefactor',
           'appPlayerCurrentPlaying'
         ]
       }
